@@ -1,0 +1,84 @@
+---
+title: "Intuitive Probabalistic Derivation of Black Scholes"
+output: html_notebook
+---
+Today I will be debuting my first mathematics blog post. Hopefuly it will be part of my series on all the creative derivations of Black Scholes Merton Option Pricing Model (BSM-OPM). This is the most simple one I've found, that uses only logic of compounding prices, and Log Normal Distributions. 
+
+**Lets Start by defining features of Stock Prices and Random Variables:**
+
+1. Future Value of Stock Price is the price today compounded continuosly into the future $F_0^T = S_0e^{rT}$. If you want more info Check out version of Hull in the chapter titled "Properties of Stocl Options".
+
+2. Random Variables of a log normal distribution $x_L$:
+
+    a. continuously distributed over $0<x_L<+\infty$.
+  
+    b. follows probability density function $f_L(x_L)$.
+  
+    c. The standard normal random variable $x_N=ln[x_L]$.
+  
+    d. Define conventions for means and variances of these distributions:
+  
+        i. Log Normal Distribution has Mean and Variance $\mu_L$ and $\sigma^2_L$
+    
+        ii. Standard Normal Distribution has Mean and Variance $\mu_N$ and  $\sigma^2_N$.
+    
+3. We can caluclate the log normal mean $\mu_L$:
+ 
+      $\mu_L= \int_0^\infty{x_Lf_L(x_L)}dx_L$
+  
+      $\mu_L= e^{\mu_N + \frac{1}2\sigma^2_N}$
+
+4. Now lets introduce a 'tructated' also called partial distribution of $x_L$ which we will call $\mu_k$, where $k<x_L<+\infty$ and $k>0$. 
+  
+      $\mu_k=\int^\infty_k{(x_L-k)f_L(x_L)}dx_L$
+  
+      Which evaluates to:
+  
+      $\mu_k=e^{\mu_N+\frac{1}2\sigma^2_N} \phi(\frac{-ln(k) + \mu_N + \sigma^2_N}{\sigma_N}) -k\phi(\frac{-ln(k)+\mu_N}{\sigma_N})$
+  
+      Where $\phi(y)$ is the Cummulative Distribution Function (CDF) of a standard normal random variable. 
+  
+      $\phi(y) = \int^y_{-\infty}f_N(y_N)dy_N$
+      
+Hopefully I've introduced the tools we'll be using to make a rational argument for the accepted BS-OPM.
+  
+**Justification of Black Scholes:**
+
+1. Lets define some things:
+  
+    i. A *European Call* at strike $k$ can be surmised as $C^T_0(k)$.
+
+    ii. The expected price of a Stock in the future is the Mean of a  Log normal distribution. $\mu_L = S_0e^{rT}$.
+
+    iii. Standard Normal Variance and be expressed as a stationtionary volatility weighted by time T. $\sigma^2_N = \sigma^2T$.
+  
+    iv. putting i. ii. and iii. together we can express the expected future stock price as $e^{\mu_N \frac{1}2\sigma^2T}=S_0e^{rT}$.
+    
+    v. Solving for we get: $\mu_N = ln(S_0) + (r - \frac{1}2\sigma^2)T$
+
+2. Now the price of the Call is expressed as a partial distribution of my stock price with Strike K. 
+
+    $\mu_L(K)=e^{ln(S_0)+rT}\phi(\frac{-ln(K)+ln(S_0)+rT+\frac{1}2\sigma^2T}{T\sqrt{\sigma}}) - K\phi(\frac{-ln(K)+ln(S_0)+rT-\frac{1}2\sigma^2T}{T\sqrt{\sigma}})$
+
+    This expectation of the partial distribution function is an expectation of the future. 
+
+    $\mu_L = C^T_0(K)e^{rT} = S_0e^{rT}\phi(\frac{ln(\frac{S_0}K)+(r+\frac{1}2\sigma^2)T}{T\sqrt{\sigma}}) - K\phi(\frac{ln(\frac{S_0}K)+(r-\frac{1}2\sigma^2)T}{T\sqrt{\sigma}})$
+
+    Dividing both sides by discounting back today by dividing by $e^{rT}$.
+
+    $C^T_0(K) = S_0\phi(\frac{ln(\frac{S_0}K)+(r+\frac{1}2\sigma^2)T}{T\sqrt{\sigma}}) - Ke^{-rT}\phi(\frac{ln(\frac{S_0}K)+(r-\frac{1}2\sigma^2)T}{T\sqrt{\sigma}})$
+
+3. Comparing it to BS-OPM:
+
+    $C(S_0,0) = \phi(d_1)S_0 - \phi(d_2)Ke^{-rT}$
+    
+    $d_1 = \frac{1}{\sigma\sqrt{T}}[ln(\frac{S_0}K) + (r + \frac{\sigma^2}2)T]$
+
+    $d_2 = d_1 -\sigma \sqrt{T} \rightarrow \frac{1}{\sigma\sqrt{T}}[ln(\frac{S_0}K) + (r - \frac{\sigma^2}2)T]$
+
+**Reflections:**
+
+This intuitive approach to solving the BS-OPM shows that given the "No Arbitrage Condition"" and a log normal distribution of stock returns we can express the no arbitrage stock price as an expectation $\mu_L$ of the log normal distribution. When working with a call, you know it has no value below the strike price. We model that into the expectation using a partial distribution of the random variable. Next I'll do the more classical SDE and the Euler Style Numerical approasch to solving BS-OPM. 
+
+Reference:
+[Intuitive Proof of Black Scholes Option Pricing Formula By Alexei Kruoglov](https://arxiv.org/ftp/physics/papers/0612/0612022.pdf)
