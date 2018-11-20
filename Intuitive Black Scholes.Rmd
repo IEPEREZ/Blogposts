@@ -1,34 +1,34 @@
 ---
-title: "Intuitive Probabalistic Derivation of Black Scholes"
+title: "Intuitive Probabilistic Derivation of Black Scholes - Option Pricing Formula"
 output: html_notebook
 ---
-Today I will be debuting my first mathematics blog post. Hopefuly it will be part of my series on all the creative derivations of Black Scholes Merton Option Pricing Model (BSM-OPM). This is the most simple one I've found, that uses only logic of compounding prices, and Log Normal Distributions. 
+Today I will be debuting my first mathematics blog post. Hopefuly it will be part of my series on all the creative derivations of the Black Scholes Merton Option Pricing Model (BSM-OPM). This is the most simple one I've found, that uses only logic of compounding prices, and Log Normal Distributions. 
 
-**Lets Start by defining features of Stock Prices and Random Variables:**
+**Lets start by defining features of Stock Prices and Random Variables:**
 
-1. Future Value of Stock Price is the price today compounded continuosly into the future $F_0^T = S_0e^{rT}$. If you want more info Check out version of Hull in the chapter titled "Properties of Stocl Options".
+1. Future Value of a Stock Price is the price today compounded continuosly into the future $F_0^T = S_0e^{rT}$. If you want more info check out any version of Hull in the chapter titled "Properties of Stock Options".
 
-2. Random Variables of a log normal distribution $x_L$:
+2. Random Variables of a Log Normal Distribution $x_L$:
 
-    a. continuously distributed over $0<x_L<+\infty$.
+    a. are continuously distributed over $0<x_L<+\infty$.
   
-    b. follows probability density function $f_L(x_L)$.
+    b. follow probability density function $f_L(x_L)$.
   
-    c. The standard normal random variable $x_N=ln[x_L]$.
+    c. can map to the Standard Normal Random Variable $x_N=ln[x_L]$.
   
-    d. Define conventions for means and variances of these distributions:
+3. Conventions for means and variances of these distributions:
   
-        i. Log Normal Distribution has Mean and Variance $\mu_L$ and $\sigma^2_L$
+    a. Log Normal Distribution has Mean and Variance $\mu_L$ and $\sigma^2_L$
     
-        ii. Standard Normal Distribution has Mean and Variance $\mu_N$ and  $\sigma^2_N$.
+    b. Standard Normal Distribution has Mean and Variance $\mu_N$ and  $\sigma^2_N$.
     
-3. We can caluclate the log normal mean $\mu_L$:
+4. We can caluclate the log normal mean $\mu_L$:
  
       $\mu_L= \int_0^\infty{x_Lf_L(x_L)}dx_L$
   
       $\mu_L= e^{\mu_N + \frac{1}2\sigma^2_N}$
 
-4. Now lets introduce a 'tructated' also called partial distribution of $x_L$ which we will call $\mu_k$, where $k<x_L<+\infty$ and $k>0$. 
+5. Now lets introduce a 'truncated' also called Partial Distribution of $x_L$ which we will call $\mu_k$, where $k<x_L<+\infty$ and $k>0$. 
   
       $\mu_k=\int^\infty_k{(x_L-k)f_L(x_L)}dx_L$
   
@@ -42,9 +42,9 @@ Today I will be debuting my first mathematics blog post. Hopefuly it will be par
       
 Hopefully I've introduced the tools we'll be using to make a rational argument for the accepted BS-OPM.
   
-**Justification of Black Scholes:**
+**Justification of BS-OPM:**
 
-1. Lets define some things:
+1. Making the analogy that a Partial Normal Distribution model the expectation of a call option we can say:
   
     i. A *European Call* at strike $k$ can be surmised as $C^T_0(k)$.
 
