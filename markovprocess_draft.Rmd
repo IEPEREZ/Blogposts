@@ -1,0 +1,147 @@
+---
+title: "Markov Processes - Foundations of Stochastic Models of Finance"
+author: "Ivan E. Perez"
+date: "January 17, 2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Welcome to the Foundations of Stochastic Models of Finance series. This is a small set of blogposts that will let me build up to the traditional short derivation of BSM-OPM. These posts are meant to communicate an intuitive feel of the underlying principles and assumptions we need to get to BM-OPM. 
+
+##### The Markov Chain: 
+
+The Markov chain is a sequence of Random Variables with the Markov Property.
+
+##### The Markov Property:
+
+The Markov Property states that future and past states are independent.
+
+$$ P\left \{ 
+ X_{n+1} = j | X_{n}=i, X_{n-1}=i_{n-1}, ..., X_{0}=i_{0}
+ \right \} = p_{ij} $$
+
+In English: The conditional probability of the next state given all past states including the present state is a preset probability. 
+
+$$
+p_{ij} = \left \{
+X_{n+1}=j| X_n= i_n
+\right \}
+$$
+$$\forall n, i_0,...,i_{n-1},i_n, j $$
+Where $$ i, j \in \left \{ 1,2, ... , M\right \} $$ represents discrete state space.
+
+##### Transition Graphs and Matrices
+
+Now, that we know Markov Processes probabilites are not "informed" by any past or future state, we can describe transitions from State A to State B using a transition and set probabilies. 
+
+Let $P$ be the $M \times M$ Transition Matrix containing the transition probabilities from state $i\rightarrow j$. (i.e. each element in the matrix, is giving me a probability that you can move from state $i$ to state $j$). 
+
+$$ 
+P =
+\left [ \begin{array}{cccc}
+ p_{11} & p_{12} & \cdots & p_{1M} \\
+ p_{21} & p_{22} & \cdots & p_{2M} \\
+ \vdots & \vdots & \ddots & \vdots \\
+ p_{M1} & p_{M2} & \cdots & p_{MM}
+ \end{array} \right]
+$$
+Lets give the transition matrix some values. 
+$$
+P =
+\left [ \begin{array}{cccc}
+ 0 & 0.5 & 0 & 0 \\
+ 0.5 & 0 & 0.25 & 0.25 \\
+ 0 & 0.4 & 0.4 & 0.2 \\
+ 0 & 0 & 0 & 1
+ \end{array} \right]
+$$
+
+Transition graphs are just small plots that we can use to intuitively display the transition matrix. In this case, moving from state $1$ to state $2$ has a 50% chance of occuring.
+
+```{r echo=FALSE, message=FALSE }
+# Create my Transition Matrix
+P <- matrix( c(
+  0,0.5,0, 0,
+  0.5, 0, 0.25, 0.25,
+  0, 0.4,0.4,0.2,
+  0, 0, 0, 1), nrow=4,ncol=4 
+)
+P <- t(P)
+
+# Plotting the Transition Graph 
+# taken from https://datascience.stackexchange.com/questions/14801/transition-plot-in-r-how-does-it-work
+
+library(igraph)
+p <- graph_from_adjacency_matrix(P, weighted = "prob")
+
+E(p)$prob <- ifelse(is.nan(E(p)$prob), NA, E(p)$prob)
+
+plot(p, edge.label = round(E(p)$prob, 2), edge.arrow.size= 1, edge.label.cex = 1)
+
+```
+
+#### Classification of States
+
+##### Accessible States: 
+There is a directed path in the transition grapsh/matrix such that the transition probability from state $i$ to $j$ is non-zero. 
+
+
+##### Communicable States:
+There is a non-zero probability from state $i$ to $j$ and there is a non-zero probabiltiy moving from $j$ to $i$. 
+
+
+##### Recurrent States:
+For every state $j$ that is accessible from $i$ the state $i$ is also accessible from $j$. 
+
+
+##### Absorbing States:
+The probability of transitioning from $i$ to $j$ and $j$ to $i$ is $1$.
+
+#### Example: Gamblers Ruin 
+A classic problem that explains why the house alway. Lets say, I start with two dollars (State = 2), and my opponent starts with 3 dollars. I'm pretty good so 2/3 times I can beat him, so 1/3 times he beats me. when I beat him he gives me a dollar. I will quit when I'm down to one dollar and he will quit when he's broke. What is the probability of me winning? 
+
+Lets construct a transition graph and matrix to describe my sit. 
+
+```{r echo=FALSE, message=FALSE}
+
+# Create my Transition Matrix
+GR <- matrix( c(
+  1,0,0, 0,
+  1/3, 0, 2/3, 0,
+  0, 1/3,0,2/3,
+  0, 0, 0, 1), nrow=4,ncol=4 
+)
+GR <- t(GR)
+
+library(igraph)
+gr <- graph_from_adjacency_matrix(GR, weighted = "prob")
+
+E(gr)$prob <- ifelse(is.nan(E(gr)$prob), NA, E(gr)$prob)
+
+plot(gr, edge.label = round(E(gr)$prob, 2), edge.arrow.size= 1, edge.label.cex = 1)
+```
+
+Now lets show the transition matrix $GR$.
+
+$$
+GR =
+\left [ \begin{array}{cccc}
+ 1 & 0 & 0 & 0 \\
+ 1/3 & 0 & 2/3 & 0 \\
+ 0 & 1/3 & 0 & 2/3 \\
+ 0 & 0 & 0 & 1
+ \end{array} \right]
+$$
+
+I can find the probability of winning by adding up probabilities of winning by adding the markov chain. 
+
+So the probability of winning is $P \left \{ p_{23}*p_{34} \right\} = (2/3)*(2/3) = 4/9$. 
+
+What can we take away from this? We can extended this to build someething like a blackjack odds calculator. But, the most important thing is to remember that when we hear the word Markov Property. **The Markov Property simply tells us, the probability of the next movement is independent of any of the past(and future) states.**
+
+*Sounds eerily like the disclaimer of every investment product.*
