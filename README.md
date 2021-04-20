@@ -1,2 +1,2 @@
 # Blogposts
-Blogposts to https://ieperez.wordpress.com
+Blogposts to https://ivaneperez.com
